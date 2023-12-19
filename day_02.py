@@ -13,6 +13,7 @@ def min_cubes_rgb(line: str) -> Tuple[int, int, int]:
         max([int(m.group(1)) for m in re.finditer("(\d+) blue", line)]),
     )
 
+
 def is_game_valid(
     line: str, max_r: int = 12, max_g: int = 13, max_b: int = 14
 ) -> bool:
