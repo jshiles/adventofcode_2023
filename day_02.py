@@ -2,7 +2,16 @@ import argparse
 from pathlib import Path
 import re
 import sys
+from typing import Tuple
 
+
+def min_cubes_rgb(line: str) -> Tuple[int, int, int]:
+    """Return the min cubes of each color in a Tuple. Red, Gree, Blue"""
+    return (
+        max([int(m.group(1)) for m in re.finditer("(\d+) red", line)]),
+        max([int(m.group(1)) for m in re.finditer("(\d+) green", line)]),
+        max([int(m.group(1)) for m in re.finditer("(\d+) blue", line)]),
+    )
 
 def is_game_valid(
     line: str, max_r: int = 12, max_g: int = 13, max_b: int = 14
@@ -11,9 +20,7 @@ def is_game_valid(
     If the game does not violate the color constraints, return True
     else False
     """
-    reds = max([int(m.group(1)) for m in re.finditer("(\d+) red", line)])
-    greens = max([int(m.group(1)) for m in re.finditer("(\d+) green", line)])
-    blues = max([int(m.group(1)) for m in re.finditer("(\d+) blue", line)])
+    reds, greens, blues = min_cubes_rgb(line)
     return reds <= max_r and greens <= max_g and blues <= max_b
 
 
@@ -34,9 +41,7 @@ def game_power(line: str) -> int:
     """
     Returns the multiplication of the min number of each cube required.
     """
-    reds = max([int(m.group(1)) for m in re.finditer("(\d+) red", line)])
-    greens = max([int(m.group(1)) for m in re.finditer("(\d+) green", line)])
-    blues = max([int(m.group(1)) for m in re.finditer("(\d+) blue", line)])
+    reds, greens, blues = min_cubes_rgb(line)
     return reds * greens * blues
 
 
@@ -71,7 +76,8 @@ def main(argv) -> None:
     """ """
     parser = init_parser()
     args = parser.parse_args(argv)
-    # print(sum_valid_game_numbers(args.inputfile))
+    print(sum_valid_game_numbers(args.inputfile))
+    args.inputfile.seek(0)  # reset the file handler for pt2
     print(sum_game_power(args.inputfile))
     return
 
