@@ -45,7 +45,9 @@ def destination_to_source(
 
 
 def find_locations(seed: int) -> int:
-    """ """
+    """
+    Given a seed, find the corresponding location.
+    """
     soil = source_to_destination(seed, SEED_TO_SOIL)
     fert = source_to_destination(soil, SOIL_TO_FERTILIZER)
     water = source_to_destination(fert, FERTILIZER_TO_WATER)
@@ -56,7 +58,9 @@ def find_locations(seed: int) -> int:
 
 
 def find_seed(location: int) -> int:
-    """ """
+    """ 
+    Given a location, find the corresponding seed.
+    """
     humidity = destination_to_source(location, HUMIDITY_TO_LOCATION)
     temp = destination_to_source(humidity, TEMPERATURE_TO_HUMIDITY)
     light = destination_to_source(temp, LIGHT_TO_TEMPERATURE)
@@ -67,12 +71,19 @@ def find_seed(location: int) -> int:
 
 
 def is_starter_seed(seed, seed_ranges: List[SeedRange]) -> bool:
+    """
+    Is this seed in the set of starter seed ranges? Return bool.
+    """
     return any([sr.in_range(seed) for sr in seed_ranges])
 
 
 def search_ranges(
     start: int, stop: int, seed_ranges: FrozenSet[SeedRange]
 ) -> List[bool]:
+    """
+    Given a range of locations, search for the lowest location number that
+    maps to a seed in the starter set.
+    """
     return [
         is_starter_seed(find_seed(loc), seed_ranges)
         for loc in range(start, stop)
@@ -81,6 +92,7 @@ def search_ranges(
 
 def main(argv) -> None:
     """ """
+    # test ranges.
     # seed_ranges: FrozenSet[SeedRange] = frozenset([
     #     SeedRange(79, 1),
     #     SeedRange(14, 1),
