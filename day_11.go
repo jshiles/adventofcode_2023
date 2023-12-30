@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 	"regexp"
 )
@@ -13,41 +12,51 @@ type Point struct {
 	Y int
 }
 
-func (p1 *Point) manh(p2 Point) int {
-	return int(math.Abs(float64(p1.X-p2.X)) + math.Abs(float64(p1.Y-p2.Y)))
-}
+func (p1 *Point) manhTrunc(p2 Point, truncFactor int, truncRows, truncCols []int) int {
+	distance := 0
 
-func insertDuplicateColumn(arr [][]string, columnIndex int) [][]string {
-	for i := range arr {
-		if columnIndex >= 0 && columnIndex < len(arr[i]) {
-			// Duplicate the column
-			duplicate := make([]string, len(arr[i][columnIndex:]))
-			copy(duplicate, arr[i][columnIndex:])
-
-			// Insert the duplicated column next to the original column
-			arr[i] = append(arr[i][:columnIndex+1], append([]string{"."}, arr[i][columnIndex+1:]...)...)
-			copy(arr[i][columnIndex+1:], duplicate)
+	minX, maxX := min(p1.X, p2.X), max(p1.X, p2.X)
+	for i := minX; i < maxX; i++ {
+		if isIn(i, truncRows) {
+			distance += truncFactor
+		} else {
+			distance += 1
 		}
 	}
 
-	return arr
-}
-
-func insertDuplicateRow(arr [][]string, rowIndex int) [][]string {
-	var dupArr [][]string
-
-	for i, _ := range arr {
-		duplicate := make([]string, len(arr[rowIndex]))
-		copy(duplicate, arr[i])
-		dupArr = append(dupArr, duplicate)
-		if i == rowIndex {
-			duplicate2 := make([]string, len(arr[rowIndex]))
-			copy(duplicate2, arr[rowIndex])
-			dupArr = append(dupArr, duplicate2)
+	minY, maxY := min(p1.Y, p2.Y), max(p1.Y, p2.Y)
+	for i := minY; i < maxY; i++ {
+		if isIn(i, truncCols) {
+			distance += truncFactor
+		} else {
+			distance += 1
 		}
 	}
 
-	return dupArr
+	return distance
+}
+
+func isIn(x int, arr []int) bool {
+	for _, a := range arr {
+		if a == x {
+			return true
+		}
+	}
+	return false
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func emptyCols(arr [][]string) []int {
@@ -80,18 +89,6 @@ func emptyRows(arr [][]string) []int {
 		}
 	}
 	return emptyIdx
-}
-
-func gravitationalExpansion(universe [][]string) [][]string {
-	eCols := emptyCols(universe)
-	eRows := emptyRows(universe)
-	for i, col := range eCols {
-		universe = insertDuplicateColumn(universe, col+i)
-	}
-	for i, row := range eRows {
-		universe = insertDuplicateRow(universe, row+i)
-	}
-	return universe
 }
 
 func galaxyFinder(universe [][]string) []Point {
@@ -144,7 +141,6 @@ func main() {
 	}
 	filename := os.Args[1]
 	universe := read_file(filename)
-	universe = gravitationalExpansion(universe)
 	// for _, seq := range universe {
 	// 	fmt.Printf("%v\n", seq)
 	// }
@@ -156,13 +152,22 @@ func main() {
 	}
 	fmt.Printf("\n")
 
-	sumDistances := 0
+	sumDistancesGravity := 0
 	pairs := uniquePairs(galaxies)
+	eCols := emptyCols(universe)
+	eRows := emptyRows(universe)
 	for _, pair := range pairs {
 		p1, p2 := pair[0], pair[1]
-		minDistance := p1.manh(p2)
-		sumDistances += minDistance
-		// fmt.Printf("Pair (%d, %d), (%d, %d) -> %d\n", p1.X, p1.Y, p2.X, p2.Y, minDistance)
+		minDistance := p1.manhTrunc(p2, 2, eRows, eCols)
+		sumDistancesGravity += minDistance
 	}
-	fmt.Printf("Sum min distances: %d\n", sumDistances)
+	fmt.Printf("P1: Sum min distances (2x): %d\n", sumDistancesGravity)
+
+	sumDistancesGravity = 0
+	for _, pair := range pairs {
+		p1, p2 := pair[0], pair[1]
+		minDistance := p1.manhTrunc(p2, 1000000, eRows, eCols)
+		sumDistancesGravity += minDistance
+	}
+	fmt.Printf("P2: Sum min distances(1Mx): %d\n", sumDistancesGravity)
 }
