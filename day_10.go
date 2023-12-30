@@ -219,14 +219,14 @@ func read_file(filename string) [][]string {
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run day_09.go <filename>")
+		fmt.Println("Usage: go run day_10.go <filename>")
 		return
 	}
 	filename := os.Args[1]
 	pipeMap := read_file(filename)
-	for _, seq := range pipeMap {
-		fmt.Printf("%v\n", seq)
-	}
+	// for _, seq := range pipeMap {
+	// 	fmt.Printf("%v\n", seq)
+	// }
 
 	// Part 1
 	path := findPath(pipeMap)
@@ -239,11 +239,10 @@ func main() {
 		for j, _ := range seq {
 			p := Point{i, j}
 			if isPointPartOfPolygon(p, path[:len(path)-1]) && !p.isIn(path) {
-				fmt.Printf("Inside (%d, %d)\n", i, j)
+				// fmt.Printf("Inside (%d, %d)\n", i, j)
 				pointsInside += 1
 			}
 		}
 	}
-
 	fmt.Printf("Points inside the pipe path: %d\n", pointsInside)
 }
