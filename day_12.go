@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -14,53 +13,81 @@ type ConditionalRecord struct {
 	Pattern []int
 }
 
-func (cr *ConditionalRecord) numArrangements() int {
-	regex := generateRegex(cr.Pattern)
-	// fmt.Println(regex)
+// Increase length of Springs by repeating it "times" with "sep" in between
+func (cr *ConditionalRecord) expandString(times int, sep string) string {
+	if times == 1 {
+		return cr.Springs
+	}
+	return strings.TrimSuffix(strings.Repeat(cr.Springs+sep, times), sep)
+}
 
-	var permutations []string
-	generatePermutations(cr.Springs, 0, "", &permutations)
+// Increase length of Pattern by repeating "times"
+func (cr *ConditionalRecord) expandPattern(times int) []int {
+	var newPattern []int
+	for i := 0; i < times; i++ {
+		newPattern = append(newPattern, cr.Pattern...)
+	}
+	return newPattern
+}
 
-	validArrangments := 0
-	for _, perm := range permutations {
-		match, err := regexp.MatchString(regex, perm)
-		if err == nil {
-			// fmt.Printf("%s %v\n", perm, match)
-			if match {
-				validArrangments += 1
+// https://adventofcode.com/2023/day/12
+// Part 1 fold == 1
+// Part 2 fold == 5
+func (cr *ConditionalRecord) numArrangements(fold int) int {
+	pattern := cr.expandPattern(fold)
+	record := cr.expandString(fold, "?")
+
+	positions := make(map[int]int)
+	positions[0] = 1
+	for i, contiguous := range pattern {
+		updatedPositions := make(map[int]int)
+		for key, val := range positions {
+			for n := key; n < len(record)-sum(pattern, i+1, len(pattern))+len(pattern[i+1:]); n++ {
+				if n+contiguous-1 < len(record) && !isIn(".", record[n:n+contiguous]) {
+					if (i == len(pattern)-1 && !isIn("#", record[n+contiguous:])) ||
+						(i < len(pattern)-1 && n+contiguous < len(record) && string(record[n+contiguous]) != "#") {
+						posvalue, exists := updatedPositions[n+contiguous+1]
+						if exists {
+							updatedPositions[n+contiguous+1] = posvalue + val
+						} else {
+							updatedPositions[n+contiguous+1] = val
+						}
+					}
+				}
+				if string(record[n]) == "#" {
+					break
+				}
 			}
 		}
+		positions = updatedPositions
+	}
+
+	// sum valid arrangements
+	validArrangments := 0
+	for _, v := range positions {
+		validArrangments += v
 	}
 
 	return validArrangments
 }
 
-func generateRegex(pattern []int) string {
-	var regexPattern strings.Builder
-	regexPattern.WriteString("^\\.*")
-	for i, num := range pattern {
-		if i == len(pattern)-1 {
-			regexPattern.WriteString(fmt.Sprintf("#{%d}", num))
-		} else {
-			regexPattern.WriteString(fmt.Sprintf("#{%d}\\.+", num))
-		}
+// sum part of a slice
+func sum(arr []int, start, stop int) int {
+	subsetSum := 0
+	for i := start; i < stop; i++ {
+		subsetSum += arr[i]
 	}
-	regexPattern.WriteString("\\.*$")
-	return regexPattern.String()
+	return subsetSum
 }
 
-func generatePermutations(s string, index int, current string, result *[]string) {
-	if index == len(s) {
-		*result = append(*result, current)
-		return
+// is x a substring of arr
+func isIn(x string, arr string) bool {
+	for _, a := range arr {
+		if string(a) == x {
+			return true
+		}
 	}
-
-	if s[index] == '?' {
-		generatePermutations(s, index+1, current+"#", result)
-		generatePermutations(s, index+1, current+".", result)
-	} else {
-		generatePermutations(s, index+1, current+string(s[index]), result)
-	}
+	return false
 }
 
 func inputToSlice(s string) []int {
@@ -100,11 +127,20 @@ func main() {
 	}
 	filename := os.Args[1]
 	springRecords := read_file(filename)
+
 	totalMatches := 0
 	for _, cr := range springRecords {
-		matches := cr.numArrangements()
+		matches := cr.numArrangements(1)
 		totalMatches += matches
 		// fmt.Printf("Matches: %d (%s <- %v)\n", matches, cr.Springs, cr.Pattern)
 	}
-	fmt.Printf("Total matches: %d\n", totalMatches)
+	fmt.Printf("Total matches (Part 1): %d\n", totalMatches)
+
+	totalMatches = 0
+	for _, cr := range springRecords {
+		matches := cr.numArrangements(5)
+		totalMatches += matches
+		// fmt.Printf("Matches: %d (%s <- %v)\n", matches, cr.Springs, cr.Pattern)
+	}
+	fmt.Printf("Total matches (Part 2): %d\n", totalMatches)
 }
