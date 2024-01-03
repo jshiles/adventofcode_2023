@@ -20,13 +20,29 @@ func (r *Rock) MoveNorth(rocks Rocks) bool {
 	return false
 }
 
-// func (r *Rock) MoveSouth(rocks Rocks, maxX int) bool {
-// 	if r.Type == "O" && r.X < maxX && !rocks.Contains(r.X+1, r.Y) {
-// 		r.X += 1
-// 		return true
-// 	}
-// 	return false
-// }
+func (r *Rock) MoveWest(rocks Rocks) bool {
+	if r.Type == "O" && r.Y > 0 && !rocks.Contains(r.X, r.Y-1) {
+		r.Y -= 1
+		return true
+	}
+	return false
+}
+
+func (r *Rock) MoveSouth(rocks Rocks, maxX int) bool {
+	if r.Type == "O" && r.X < maxX-1 && !rocks.Contains(r.X+1, r.Y) {
+		r.X += 1
+		return true
+	}
+	return false
+}
+
+func (r *Rock) MoveEast(rocks Rocks, maxY int) bool {
+	if r.Type == "O" && r.Y < maxY-1 && !rocks.Contains(r.X, r.Y+1) {
+		r.Y += 1
+		return true
+	}
+	return false
+}
 
 type Rocks []Rock
 
@@ -86,6 +102,93 @@ func (r Rocks) LoadSouth() int {
 	return load
 }
 
+func (rocks Rocks) Cycle(maxX, maxY int) {
+	for {
+		modified := false
+		sort.Sort(rocks)
+		for n, _ := range rocks {
+			moved := rocks[n].MoveNorth(rocks)
+			if moved {
+				// fmt.Printf("Moved %s (%d, %d)\n", rocks[i].Type, rocks[i].X, rocks[i].Y)
+				modified = true
+			}
+		}
+		if !modified {
+			break
+		}
+	}
+	for {
+		modified := false
+		sort.Sort(rocks)
+		for w, _ := range rocks {
+			moved := rocks[w].MoveWest(rocks)
+			if moved {
+				// fmt.Printf("Moved %s (%d, %d)\n", rocks[i].Type, rocks[i].X, rocks[i].Y)
+				modified = true
+			}
+		}
+		if !modified {
+			break
+		}
+	}
+	for {
+		modified := false
+		sort.Sort(rocks)
+		for s := len(rocks) - 1; s >= 0; s-- {
+			moved := rocks[s].MoveSouth(rocks, maxX)
+			if moved {
+				// fmt.Printf("Moved %s (%d, %d)\n", rocks[s].Type, rocks[s].X, rocks[s].Y)
+				modified = true
+			}
+		}
+		if !modified {
+			break
+		}
+	}
+	for {
+		modified := false
+		sort.Sort(rocks)
+		for e := len(rocks) - 1; e >= 0; e-- {
+			moved := rocks[e].MoveEast(rocks, maxY)
+			if moved {
+				// fmt.Printf("Moved %s (%d, %d)\n", rocks[i].Type, rocks[i].X, rocks[i].Y)
+				modified = true
+			}
+		}
+		if !modified {
+			break
+		}
+	}
+}
+
+func areListsIdentical(list1, list2 Rocks) bool {
+	if len(list1) != len(list2) {
+		return false
+	}
+
+	for i := range list1 {
+		if list1[i] != list2[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func deepCopy(original Rocks) Rocks {
+	copyOfArray := make(Rocks, len(original))
+
+	for i, v := range original {
+		copyOfArray[i] = Rock{
+			Type: v.Type,
+			X:    v.X,
+			Y:    v.Y,
+		}
+	}
+
+	return copyOfArray
+}
+
 func read_file(filename string) (Rocks, int, int) {
 	file, _ := os.Open(filename)
 	var rocks Rocks
@@ -114,29 +217,32 @@ func main() {
 		return
 	}
 	filename := os.Args[1]
-	rocks, maxX, _ := read_file(filename)
+	rocks, maxX, maxY := read_file(filename)
 
-	// fmt.Println(maxX, maxY)
-	// rocks.PrettyPrint(maxX, maxY)
+	var prev []Rocks
+	loops := 1000000000
+	cycleDetected := false
+	for cycle := 0; cycle < loops; cycle++ {
+		prev = append(prev, deepCopy(rocks))
+		rocks.Cycle(maxX, maxY)
+		fmt.Printf("Cycle [%d]: Northern: %d\n", cycle, rocks.LoadNorth(maxX))
 
-	// fmt.Println(rocks[9].MoveNorth(rocks))
-
-	for {
-		modified := false
-		sort.Sort(rocks)
-		for i, _ := range rocks {
-			moved := rocks[i].MoveNorth(rocks)
-			if moved {
-				// fmt.Printf("Moved %s (%d, %d)\n", rocks[i].Type, rocks[i].X, rocks[i].Y)
-				modified = true
+		loopStart := 0
+		for i, prior := range prev {
+			if areListsIdentical(prior, rocks) {
+				cycleDetected = true
+				loopStart = i
+				break
 			}
 		}
-		if !modified {
+		if cycleDetected {
+			fmt.Printf("At cycle %d, we detcted a cycle because it matched %d\n", cycle, loopStart)
+			fmt.Printf("Answer at cycle: %d\n", loopStart+int((loops-loopStart)%(cycle-loopStart+1))-1)
 			break
 		}
 	}
-
-	// rocks.PrettyPrint(maxX, maxY)
-	fmt.Printf("Southern Load: %d\n", rocks.LoadSouth())
-	fmt.Printf("Northern Load: %d\n", rocks.LoadNorth(maxX))
+	if !cycleDetected {
+		rocks.PrettyPrint(maxX, maxY)
+		fmt.Printf("Northern Load: %d\n", rocks.LoadNorth(maxX))
+	}
 }
