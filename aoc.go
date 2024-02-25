@@ -43,6 +43,6 @@ func main() {
 	case "15":
 		day15.Run(filename)
 	default:
-		fmt.Println("Unknown function:", day)
+		fmt.Printf("Day %s not implemented.\n", day)
 	}
 }
