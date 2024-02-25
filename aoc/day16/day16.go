@@ -37,22 +37,17 @@ func (s *Space) OutputDirection(incomingDir int) []int {
 	return outgoing
 }
 
-// func readInput(filename string) []string {
-//
-// }
+func engergizedTiles(initseq []string) int {
+	return 0
+}
+
+func readInput(filename string) []string {
+	var seq []string
+	return seq
+}
 
 func Run(filename string) {
 	initseq := readInput(filename)
-
-	var boxes [256]Box
-	for _, seq := range initseq {
-		label, boxID, action, focalLength := extractLabel(seq)
-		if action == "=" {
-			boxes[boxID].AddLens(label, focalLength)
-		} else if action == "-" {
-			boxes[boxID].RemoveLens(label)
-		}
-	}
-
-	fmt.Printf("Focal Power: %d\n", focusingPower(boxes))
+	energized := engergizedTiles(initseq)
+	fmt.Printf("Energized tiles: %d\n", energized)
 }
