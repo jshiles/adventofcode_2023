@@ -1,4 +1,4 @@
-package main
+package day14
 
 import (
 	"bufio"
@@ -189,7 +189,7 @@ func deepCopy(original Rocks) Rocks {
 	return copyOfArray
 }
 
-func read_file(filename string) (Rocks, int, int) {
+func readRocks(filename string) (Rocks, int, int) {
 	file, _ := os.Open(filename)
 	var rocks Rocks
 	maxX, maxY := 0, 0
@@ -211,13 +211,8 @@ func read_file(filename string) (Rocks, int, int) {
 	return rocks, maxX + 1, maxY
 }
 
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run day_14.go <filename>")
-		return
-	}
-	filename := os.Args[1]
-	rocks, maxX, maxY := read_file(filename)
+func Run(filename string) {
+	rocks, maxX, maxY := readRocks(filename)
 
 	var prev []Rocks
 	loops := 1000000000

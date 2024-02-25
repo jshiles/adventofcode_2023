@@ -1,4 +1,4 @@
-package main
+package day13
 
 import (
 	"bufio"
@@ -94,7 +94,7 @@ func convertStringSliceToIntSlice(strSlice []string) ([]int, error) {
 	return intSlice, nil
 }
 
-func read_file(filename string) [][][]int {
+func readLavaIsland(filename string) [][][]int {
 	file, _ := os.Open(filename)
 	var island [][][]int
 	var pattern [][]int
@@ -124,13 +124,8 @@ func read_file(filename string) [][][]int {
 	return island
 }
 
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run day_13.go <filename>")
-		return
-	}
-	filename := os.Args[1]
-	lavaIsland := read_file(filename)
+func Run(filename string) {
+	lavaIsland := readLavaIsland(filename)
 
 	fmt.Println(len(lavaIsland))
 

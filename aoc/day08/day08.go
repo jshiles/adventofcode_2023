@@ -1,4 +1,4 @@
-package main
+package day08
 
 import (
 	"bufio"
@@ -110,7 +110,7 @@ func stepsToZZZGhostStyle(instructions []string, network map[string]map[string]s
 	return calculateLCM(pathSteps)
 }
 
-func read_file(filename string) ([]string, map[string]map[string]string) {
+func readInstructionsMap(filename string) ([]string, map[string]map[string]string) {
 	file, _ := os.Open(filename)
 	var instructions []string
 	objectMap := make(map[string]map[string]string)
@@ -139,13 +139,8 @@ func read_file(filename string) ([]string, map[string]map[string]string) {
 	return instructions, objectMap
 }
 
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run day_08.go <filename>")
-		return
-	}
-	filename := os.Args[1]
-	instructions, objectMap := read_file(filename)
+func Run(filename string) {
+	instructions, objectMap := readInstructionsMap(filename)
 	steps := stepsToZZZGhostStyle(instructions, objectMap)
 	fmt.Printf("Steps: %d\n", steps)
 }
