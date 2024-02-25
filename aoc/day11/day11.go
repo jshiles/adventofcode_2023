@@ -1,4 +1,4 @@
-package main
+package day11
 
 import (
 	"bufio"
@@ -119,7 +119,7 @@ func uniquePairs(points []Point) [][]Point {
 }
 
 // Read the pipe map into slice of slice of strings.
-func read_file(filename string) [][]string {
+func readUniverse(filename string) [][]string {
 	file, _ := os.Open(filename)
 	var sequences [][]string
 
@@ -134,16 +134,8 @@ func read_file(filename string) [][]string {
 	return sequences
 }
 
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run day_11.go <filename>")
-		return
-	}
-	filename := os.Args[1]
-	universe := read_file(filename)
-	// for _, seq := range universe {
-	// 	fmt.Printf("%v\n", seq)
-	// }
+func Run(filename string) {
+	universe := readUniverse(filename)
 
 	galaxies := galaxyFinder(universe)
 	fmt.Printf("Galaxies (%d): ", len(galaxies))

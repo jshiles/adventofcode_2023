@@ -1,4 +1,4 @@
-package main
+package day09
 
 import (
 	"bufio"
@@ -43,7 +43,7 @@ func extrapolateLeft(seq []int) int {
 }
 
 // Read file of integeters into slice of slice of ints.
-func read_file(filename string) [][]int {
+func readIntegers(filename string) [][]int {
 	file, _ := os.Open(filename)
 	var sequences [][]int
 
@@ -63,14 +63,9 @@ func read_file(filename string) [][]int {
 	return sequences
 }
 
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run day_09.go <filename>")
-		return
-	}
-	filename := os.Args[1]
+func Run(filename string) {
 	sum := 0
-	sequences := read_file(filename)
+	sequences := readIntegers(filename)
 	for _, sequence := range sequences {
 		val := extrapolateLeft(sequence)
 		sum += val

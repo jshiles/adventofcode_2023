@@ -1,4 +1,4 @@
-package main
+package day12
 
 import (
 	"bufio"
@@ -106,7 +106,7 @@ func inputToSlice(s string) []int {
 }
 
 // Read the pipe map into slice of slice of strings.
-func read_file(filename string) []ConditionalRecord {
+func readSpringRecords(filename string) []ConditionalRecord {
 	file, _ := os.Open(filename)
 	var sequences []ConditionalRecord
 
@@ -120,13 +120,8 @@ func read_file(filename string) []ConditionalRecord {
 	return sequences
 }
 
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run day_12.go <filename>")
-		return
-	}
-	filename := os.Args[1]
-	springRecords := read_file(filename)
+func Run(filename string) {
+	springRecords := readSpringRecords(filename)
 
 	totalMatches := 0
 	for _, cr := range springRecords {

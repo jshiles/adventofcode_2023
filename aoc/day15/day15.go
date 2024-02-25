@@ -1,4 +1,4 @@
-package main
+package day15
 
 import (
 	"bufio"
@@ -116,12 +116,7 @@ func readInput(filename string) []string {
 	return data
 }
 
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run day_15.go <filename>")
-		return
-	}
-	filename := os.Args[1]
+func Run(filename string) {
 	initseq := readInput(filename)
 
 	var boxes [256]Box

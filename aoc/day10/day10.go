@@ -1,4 +1,4 @@
-package main
+package day10
 
 import (
 	"bufio"
@@ -202,7 +202,7 @@ func isPointPartOfPolygon(point Point, polygon []Point) bool {
 }
 
 // Read the pipe map into slice of slice of strings.
-func read_file(filename string) [][]string {
+func readFile(filename string) [][]string {
 	file, _ := os.Open(filename)
 	var sequences [][]string
 
@@ -217,16 +217,8 @@ func read_file(filename string) [][]string {
 	return sequences
 }
 
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run day_10.go <filename>")
-		return
-	}
-	filename := os.Args[1]
-	pipeMap := read_file(filename)
-	// for _, seq := range pipeMap {
-	// 	fmt.Printf("%v\n", seq)
-	// }
+func Run(filename string) {
+	pipeMap := readFile(filename)
 
 	// Part 1
 	path := findPath(pipeMap)
