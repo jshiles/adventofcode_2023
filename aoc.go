@@ -12,6 +12,7 @@ import (
 	"github.com/jshiles/adventofcode_2023/aoc/day13"
 	"github.com/jshiles/adventofcode_2023/aoc/day14"
 	"github.com/jshiles/adventofcode_2023/aoc/day15"
+	"github.com/jshiles/adventofcode_2023/aoc/day16"
 )
 
 func main() {
@@ -42,6 +43,8 @@ func main() {
 		day14.Run(filename)
 	case "15":
 		day15.Run(filename)
+	case "16":
+		day16.Run(filename)
 	default:
 		fmt.Printf("Day %s not implemented.\n", day)
 	}
