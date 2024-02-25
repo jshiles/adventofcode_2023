@@ -1,8 +1,6 @@
 package day08
 
 import (
-	"fmt"
-	"os"
 	"testing"
 )
 
@@ -36,7 +34,6 @@ func TestPart2(t *testing.T) {
 		{"testdata/day08.txt", 6},
 	}
 
-	fmt.Println(os.Getwd())
 	for _, tc := range testCases {
 		instructions, objectMap := readInstructionsMap(tc.filename)
 		actual := stepsToZZZGhostStyle(instructions, objectMap)
